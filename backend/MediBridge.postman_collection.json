@@ -1,0 +1,269 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "MediBridge API",
+    "description": "API collection for MediBridge hospital management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"doctor@medibridge.com\",\n    \"password\": \"doctor123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Login to get JWT token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Receptionist",
+      "item": [
+        {
+          "name": "Create Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Ravi Sharma\",\n    \"age\": 30,\n    \"gender\": \"Male\",\n    \"symptoms\": \"Fever, cough\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/receptionist/patients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "receptionist",
+                "patients"
+              ]
+            },
+            "description": "Create a new patient record"
+          }
+        },
+        {
+          "name": "Get All Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receptionist/patients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "receptionist",
+                "patients"
+              ]
+            },
+            "description": "Get list of all patients"
+          }
+        },
+        {
+          "name": "Update Patient",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Ravi Sharma\",\n    \"age\": 31,\n    \"symptoms\": \"Recovered\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/receptionist/patients/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "receptionist",
+                "patients",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Patient ID"
+                }
+              ]
+            },
+            "description": "Update patient information"
+          }
+        },
+        {
+          "name": "Delete Patient",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receptionist/patients/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "receptionist",
+                "patients",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Patient ID"
+                }
+              ]
+            },
+            "description": "Delete a patient record"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctor",
+      "item": [
+        {
+          "name": "Get All Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doctor/patients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "doctor",
+                "patients"
+              ]
+            },
+            "description": "View list of all patients"
+          }
+        },
+        {
+          "name": "Update Patient Diagnosis",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"diagnosis\": \"Viral Infection\",\n    \"prescription\": \"Paracetamol\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/doctor/patients/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "doctor",
+                "patients",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Patient ID"
+                }
+              ]
+            },
+            "description": "Update patient diagnosis and prescription"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    }
+  ]
+}
