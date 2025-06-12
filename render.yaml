@@ -1,0 +1,47 @@
+services:
+  # Backend API Service
+  - type: web
+    name: medibridge-backend
+    env: go
+    region: oregon
+    plan: free
+    buildCommand: cd backend && go build -o main ./cmd
+    startCommand: cd backend && ./main
+    envVars:
+      - key: GIN_MODE
+        value: release
+      - key: SERVER_PORT
+        value: 8080
+      - key: DB_HOST
+        fromDatabase:
+          name: medibridge-db
+          property: host
+      - key: DB_USER
+        fromDatabase:
+          name: medibridge-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: medibridge-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: medibridge-db
+          property: database
+      - key: DB_PORT
+        fromDatabase:
+          name: medibridge-db
+          property: port
+      - key: JWT_SECRET
+        sync: false
+
+  # PostgreSQL Database
+  - type: postgres
+    name: medibridge-db
+    plan: free
+    region: oregon
+    ipAllowList: []
+    disk:
+      name: medibridge-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1 
