@@ -74,11 +74,11 @@ The system comes with two default users:
 
 1. Doctor:
    - Email: doctor@medibridge.com
-   - Password: doctor@123
+   - Password: doctor123
 
 2. Receptionist:
    - Email: receptionist@medibridge.com
-   - Password: reception@123
+   - Password: reception123
 
 ## Testing
 

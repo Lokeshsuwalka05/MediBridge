@@ -60,7 +60,7 @@ func seedUsers() {
 	}
 
 	// Create doctor
-	doctorPassword, _ := bcrypt.GenerateFromPassword([]byte("doctor@123"), bcrypt.DefaultCost)
+	doctorPassword, _ := bcrypt.GenerateFromPassword([]byte("doctor123"), bcrypt.DefaultCost)
 	doctor := models.User{
 		Name:         "Dr. John Doe",
 		Email:        "doctor@medibridge.com",
@@ -70,7 +70,7 @@ func seedUsers() {
 	config.DB.Create(&doctor)
 
 	// Create receptionist
-	receptionistPassword, _ := bcrypt.GenerateFromPassword([]byte("reception@123"), bcrypt.DefaultCost)
+	receptionistPassword, _ := bcrypt.GenerateFromPassword([]byte("reception123"), bcrypt.DefaultCost)
 	receptionist := models.User{
 		Name:         "Jane Smith",
 		Email:        "receptionist@medibridge.com",
