@@ -4,12 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/medibridge/config"
 	"github.com/medibridge/models"
-	"github.com/medibridge/routes"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -23,35 +20,8 @@ func main() {
 	config.InitDB()
 
 	// Auto migrate the schema
-	config.DB.AutoMigrate(&models.User{}, &models.Patient{})
+	config.DB.AutoMigrate(&models.User{})
 
-	// Seed initial users if they don't exist
-	seedUsers()
-
-	// Initialize Gin router
-	r := gin.Default()
-
-	// Configure CORS
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // In production, replace with your frontend domain
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
-
-	// Setup routes
-	routes.SetupRoutes(r)
-
-	// Start server
-	port := os.Getenv("SERVER_PORT")
-	if port == "" {
-		port = "8080"
-	}
-	r.Run(":" + port)
-}
-
-func seedUsers() {
 	// Create doctor
 	doctorPassword, _ := bcrypt.GenerateFromPassword([]byte("doctor@#123"), bcrypt.DefaultCost)
 	doctor := models.User{
