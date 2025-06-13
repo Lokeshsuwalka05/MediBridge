@@ -20,18 +20,28 @@ func main() {
 	}
 
 	// Initialize database
+	log.Println("Initializing database connection...")
 	config.InitDB()
+	log.Println("Database connection established")
 
 	// Auto migrate the schema
+	log.Println("Running database migrations...")
 	config.DB.AutoMigrate(&models.User{}, &models.Patient{})
+	log.Println("Database migrations completed")
 
 	// Seed initial users if they don't exist
+	log.Println("Checking for default users...")
 	seedUsers()
 
 	// Initialize Gin router
 	r := gin.Default()
 
+	// Add logging middleware
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
 	// Configure CORS
+	log.Println("Configuring CORS...")
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"}, // In production, replace with your frontend domain
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -41,14 +51,19 @@ func main() {
 	}))
 
 	// Setup routes
+	log.Println("Setting up routes...")
 	routes.SetupRoutes(r)
+	log.Println("Routes setup completed")
 
 	// Start server
-	port := os.Getenv("SERVER_PORT")
+	port := os.Getenv("PORT") // Render uses PORT environment variable
 	if port == "" {
 		port = "8080"
 	}
-	r.Run(":" + port)
+	log.Printf("Server starting on port %s...", port)
+	if err := r.Run(":" + port); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }
 
 func seedUsers() {
