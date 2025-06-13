@@ -91,7 +91,7 @@ func seedUsers() {
 		if err := config.DB.Create(&doctor).Error; err != nil {
 			log.Printf("Error creating doctor: %v", err)
 		} else {
-			log.Println("Doctor user created successfully")
+			log.Println("Doctor user created successfully with email: doctor@medibridge.com and password: doctor@#123")
 		}
 	} else {
 		log.Println("Doctor user already exists")
@@ -102,7 +102,7 @@ func seedUsers() {
 		if err := config.DB.Create(&receptionist).Error; err != nil {
 			log.Printf("Error creating receptionist: %v", err)
 		} else {
-			log.Println("Receptionist user created successfully")
+			log.Println("Receptionist user created successfully with email: receptionist@medibridge.com and password: reception@#123")
 		}
 	} else {
 		log.Println("Receptionist user already exists")
