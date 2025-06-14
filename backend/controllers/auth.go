@@ -27,6 +27,22 @@ func Login(c *gin.Context) {
 	log.Printf("Login attempt for email: %s", req.Email)
 	log.Printf("Request body: %+v", req)
 
+	// Check database connection
+	if err := config.DB.Raw("SELECT 1").Error; err != nil {
+		log.Printf("Database connection error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection error"})
+		return
+	}
+	log.Printf("Database connection is healthy")
+
+	// Log all users in the database for debugging
+	var allUsers []models.User
+	if err := config.DB.Find(&allUsers).Error; err != nil {
+		log.Printf("Error fetching all users: %v", err)
+	} else {
+		log.Printf("All users in database: %+v", allUsers)
+	}
+
 	var user models.User
 	if err := config.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		log.Printf("User not found: %v", err)
@@ -37,21 +53,6 @@ func Login(c *gin.Context) {
 	log.Printf("User found: %+v", user)
 	log.Printf("Stored password hash: %s", user.PasswordHash)
 	log.Printf("Attempting to compare with provided password: %s", req.Password)
-
-	// Log the database connection status
-	if err := config.DB.Raw("SELECT 1").Error; err != nil {
-		log.Printf("Database connection error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection error"})
-		return
-	}
-
-	// Log all users in the database for debugging
-	var allUsers []models.User
-	if err := config.DB.Find(&allUsers).Error; err != nil {
-		log.Printf("Error fetching all users: %v", err)
-	} else {
-		log.Printf("All users in database: %+v", allUsers)
-	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
 		log.Printf("Password mismatch: %v", err)
