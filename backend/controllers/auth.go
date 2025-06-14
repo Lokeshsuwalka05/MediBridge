@@ -16,11 +16,12 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// Login handles user authentication
 func Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Printf("Invalid request body: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
 		return
 	}
 
@@ -79,5 +80,20 @@ func Login(c *gin.Context) {
 			"email": user.Email,
 			"role":  user.Role,
 		},
+	})
+}
+
+// ValidateToken validates the JWT token and returns the user data
+func ValidateToken(c *gin.Context) {
+	// The AuthMiddleware has already validated the token
+	// We just need to return the user data from the context
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
 	})
 } 

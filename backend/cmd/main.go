@@ -19,6 +19,12 @@ func main() {
 		log.Println("Warning: .env file not found")
 	}
 
+	// Set default JWT secret if not in environment
+	if os.Getenv("JWT_SECRET") == "" {
+		os.Setenv("JWT_SECRET", "medibridge-secret-key-2024")
+		log.Println("Using default JWT secret")
+	}
+
 	// Initialize database
 	log.Println("Initializing database connection...")
 	config.InitDB()
@@ -43,7 +49,7 @@ func main() {
 	// Configure CORS
 	log.Println("Configuring CORS...")
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // Frontend development server
+		AllowOrigins:     []string{"http://localhost:5173", "https://medibridge.vercel.app"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

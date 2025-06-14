@@ -15,6 +15,9 @@ func SetupRoutes(r *gin.Engine) {
 	authorized := r.Group("/")
 	authorized.Use(middleware.AuthMiddleware())
 
+	// Add validation endpoint
+	authorized.GET("/auth/validate", controllers.ValidateToken)
+
 	// Receptionist routes
 	receptionist := authorized.Group("/receptionist")
 	receptionist.Use(middleware.RoleMiddleware(models.RoleReceptionist))
