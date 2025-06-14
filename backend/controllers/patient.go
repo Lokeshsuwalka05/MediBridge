@@ -95,7 +95,8 @@ func GetPatients(c *gin.Context) {
 
 	// Add search condition if provided
 	if search != "" {
-		query = query.Where("name LIKE ?", "%"+search+"%")
+		query = query.Where("first_name LIKE ? OR last_name LIKE ? OR email LIKE ?", 
+			"%"+search+"%", "%"+search+"%", "%"+search+"%")
 	}
 
 	// Get total count
@@ -142,7 +143,6 @@ func UpdatePatient(c *gin.Context) {
 	}
 
 	userID, _ := c.Get("userID")
-	userRole, _ := c.Get("userRole")
 
 	var patient models.Patient
 	if err := config.DB.First(&patient, patientID).Error; err != nil {
@@ -150,27 +150,44 @@ func UpdatePatient(c *gin.Context) {
 		return
 	}
 
-	// Update fields based on role
-	if userRole == models.RoleDoctor {
-		if req.Diagnosis != "" {
-			patient.Diagnosis = req.Diagnosis
+	// Update fields if provided
+	if req.FirstName != "" {
+		patient.FirstName = req.FirstName
+	}
+	if req.LastName != "" {
+		patient.LastName = req.LastName
+	}
+	if req.Email != "" {
+		patient.Email = req.Email
+	}
+	if req.Phone != "" {
+		patient.Phone = req.Phone
+	}
+	if req.DateOfBirth != "" {
+		dob, err := time.Parse("2006-01-02", req.DateOfBirth)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date of birth format. Use YYYY-MM-DD"})
+			return
 		}
-		if req.Notes != "" {
-			patient.Notes = req.Notes
-		}
-	} else {
-		if req.Name != "" {
-			patient.Name = req.Name
-		}
-		if req.Age != 0 {
-			patient.Age = req.Age
-		}
-		if req.Gender != "" {
-			patient.Gender = req.Gender
-		}
-		if req.Symptoms != "" {
-			patient.Symptoms = req.Symptoms
-		}
+		patient.DateOfBirth = dob
+	}
+	if req.Gender != "" {
+		patient.Gender = req.Gender
+	}
+	if req.Address != "" {
+		patient.Address = req.Address
+	}
+	if req.EmergencyContact != "" {
+		patient.EmergencyContact = req.EmergencyContact
+	}
+	if req.EmergencyPhone != "" {
+		patient.EmergencyPhone = req.EmergencyPhone
+	}
+	if req.BloodGroup != "" {
+		patient.BloodGroup = req.BloodGroup
+	}
+	if req.Allergies != "" {
+		patient.Allergies = req.Allergies
 	}
 
 	patient.UpdatedBy = userID.(uint)
@@ -180,7 +197,11 @@ func UpdatePatient(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, patient)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": patient,
+		"message": "Patient updated successfully",
+	})
 }
 
 func DeletePatient(c *gin.Context) {
@@ -196,5 +217,8 @@ func DeletePatient(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Patient deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Patient deleted successfully",
+	})
 } 
