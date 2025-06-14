@@ -114,9 +114,19 @@ func seedUsers() {
 		} else {
 			log.Println("Receptionist user created successfully")
 		}
-
 	} else {
 		log.Println("Receptionist user already exists")
+	}
+
+	var existingLokesh models.User
+	if err := config.DB.Where("email = ?", lokesh.Email).First(&existingLokesh).Error; err != nil {
+		if err := config.DB.Create(&lokesh).Error; err != nil {
+			log.Printf("Error creating Lokesh: %v", err)
+		} else {
+			log.Println("Lokesh user created successfully")
+		}
+	} else {
+		log.Println("Lokesh user already exists")
 	}
 } 
  
