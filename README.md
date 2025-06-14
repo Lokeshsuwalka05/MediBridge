@@ -87,6 +87,10 @@ Run the test suite:
 go test ./...
 ```
 
+## Live Demo
+Frontend:https://medi-bridge.netlify.app/
+Backend:https://medibridge-backend-znn8.onrender.com/
+
 ## Project Structure
 
 ```
