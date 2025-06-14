@@ -85,13 +85,22 @@ func seedUsers() {
 		Role:         models.RoleReceptionist,
 	}
 
+	// Create Lokesh
+	lokeshPassword, _ := bcrypt.GenerateFromPassword([]byte("lokesh@#123"), bcrypt.DefaultCost)
+	lokesh := models.User{
+		Name:         "Lokesh Suwalka",
+		Email:        "lokesh@medibridge.com",
+		PasswordHash: string(lokeshPassword),
+		Role:         models.RoleDoctor,
+	}
+
 	// Check if users already exist
 	var existingDoctor models.User
 	if err := config.DB.Where("email = ?", doctor.Email).First(&existingDoctor).Error; err != nil {
 		if err := config.DB.Create(&doctor).Error; err != nil {
 			log.Printf("Error creating doctor: %v", err)
 		} else {
-			log.Println("Doctor user created successfully with email: doctor@medibridge.com and password: doctor@#123")
+			log.Println("Doctor user created successfully")
 		}
 	} else {
 		log.Println("Doctor user already exists")
@@ -102,9 +111,21 @@ func seedUsers() {
 		if err := config.DB.Create(&receptionist).Error; err != nil {
 			log.Printf("Error creating receptionist: %v", err)
 		} else {
-			log.Println("Receptionist user created successfully with email: receptionist@medibridge.com and password: reception@#123")
+			log.Println("Receptionist user created successfully")
 		}
 	} else {
 		log.Println("Receptionist user already exists")
 	}
+
+	var existingLokesh models.User
+	if err := config.DB.Where("email = ?", lokesh.Email).First(&existingLokesh).Error; err != nil {
+		if err := config.DB.Create(&lokesh).Error; err != nil {
+			log.Printf("Error creating Lokesh: %v", err)
+		} else {
+			log.Println("Lokesh user created successfully")
+		}
+	} else {
+		log.Println("Lokesh user already exists")
+	}
+} 
 } 
