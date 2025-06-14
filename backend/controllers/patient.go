@@ -22,6 +22,8 @@ type PatientRequest struct {
 	EmergencyPhone  string `json:"emergencyPhone" binding:"required"`
 	BloodGroup      string `json:"bloodGroup"`
 	Allergies       string `json:"allergies"`
+	Diagnosis       string `json:"diagnosis"`
+	Notes           string `json:"notes"`
 }
 
 type PatientUpdateRequest struct {
@@ -36,6 +38,8 @@ type PatientUpdateRequest struct {
 	EmergencyPhone  string `json:"emergencyPhone"`
 	BloodGroup      string `json:"bloodGroup"`
 	Allergies       string `json:"allergies"`
+	Diagnosis       string `json:"diagnosis"`
+	Notes           string `json:"notes"`
 }
 
 func CreatePatient(c *gin.Context) {
@@ -52,6 +56,13 @@ func CreatePatient(c *gin.Context) {
 		return
 	}
 
+	// Check if email already exists
+	var existingPatient models.Patient
+	if err := config.DB.Where("email = ?", req.Email).First(&existingPatient).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "A patient with this email already exists"})
+		return
+	}
+
 	userID, _ := c.Get("userID")
 	patient := models.Patient{
 		FirstName:        req.FirstName,
@@ -65,11 +76,18 @@ func CreatePatient(c *gin.Context) {
 		EmergencyPhone:  req.EmergencyPhone,
 		BloodGroup:      req.BloodGroup,
 		Allergies:       req.Allergies,
+		Diagnosis:       req.Diagnosis,
+		Notes:           req.Notes,
 		CreatedBy:       userID.(uint),
 		UpdatedBy:       userID.(uint),
 	}
 
 	if err := config.DB.Create(&patient).Error; err != nil {
+		// Check for other database errors
+		if err.Error() == "ERROR: duplicate key value violates unique constraint \"patients_email_key\" (SQLSTATE 23505)" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "A patient with this email already exists"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create patient"})
 		return
 	}
@@ -143,6 +161,7 @@ func UpdatePatient(c *gin.Context) {
 	}
 
 	userID, _ := c.Get("userID")
+	userRole, _ := c.Get("userRole")
 
 	var patient models.Patient
 	if err := config.DB.First(&patient, patientID).Error; err != nil {
@@ -188,6 +207,16 @@ func UpdatePatient(c *gin.Context) {
 	}
 	if req.Allergies != "" {
 		patient.Allergies = req.Allergies
+	}
+
+	// Only allow doctors to update diagnosis and notes
+	if userRole == models.RoleDoctor {
+		if req.Diagnosis != "" {
+			patient.Diagnosis = req.Diagnosis
+		}
+		if req.Notes != "" {
+			patient.Notes = req.Notes
+		}
 	}
 
 	patient.UpdatedBy = userID.(uint)

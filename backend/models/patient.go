@@ -19,6 +19,8 @@ type Patient struct {
 	EmergencyPhone  string         `gorm:"not null" json:"emergencyPhone"`
 	BloodGroup      string         `json:"bloodGroup"`
 	Allergies       string         `json:"allergies"`
+	Diagnosis       string         `json:"diagnosis"`
+	Notes           string         `json:"notes"`
 	CreatedBy       uint           `gorm:"not null" json:"createdBy"`
 	UpdatedBy       uint           `gorm:"not null" json:"updatedBy"`
 	CreatedAt       time.Time      `json:"createdAt"`
