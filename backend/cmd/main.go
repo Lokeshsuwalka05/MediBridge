@@ -43,11 +43,12 @@ func main() {
 	// Configure CORS
 	log.Println("Configuring CORS...")
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // In production, replace with your frontend domain
+		AllowOrigins:     []string{"http://localhost:5173"}, // Frontend development server
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           12 * 60 * 60, // 12 hours
 	}))
 
 	// Setup routes
@@ -113,19 +114,9 @@ func seedUsers() {
 		} else {
 			log.Println("Receptionist user created successfully")
 		}
+
 	} else {
 		log.Println("Receptionist user already exists")
-	}
-
-	var existingLokesh models.User
-	if err := config.DB.Where("email = ?", lokesh.Email).First(&existingLokesh).Error; err != nil {
-		if err := config.DB.Create(&lokesh).Error; err != nil {
-			log.Printf("Error creating Lokesh: %v", err)
-		} else {
-			log.Println("Lokesh user created successfully")
-		}
-	} else {
-		log.Println("Lokesh user already exists")
 	}
 } 
  
