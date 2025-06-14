@@ -25,6 +25,7 @@ func Login(c *gin.Context) {
 	}
 
 	log.Printf("Login attempt for email: %s", req.Email)
+	log.Printf("Request body: %+v", req)
 
 	var user models.User
 	if err := config.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
@@ -34,6 +35,8 @@ func Login(c *gin.Context) {
 	}
 
 	log.Printf("User found: %+v", user)
+	log.Printf("Stored password hash: %s", user.PasswordHash)
+	log.Printf("Attempting to compare with provided password: %s", req.Password)
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
 		log.Printf("Password mismatch: %v", err)
