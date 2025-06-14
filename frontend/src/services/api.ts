@@ -1,78 +1,68 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
-// Use environment variable for API URL in production
-const API_BASE_URL = 'https://medibridge-backend-znn8.onrender.com/';
-
+// Create axios instance with base URL from environment variables
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
   },
-  // Add timeout to prevent hanging requests
-  timeout: 10000,
 });
 
-// Request interceptor to add auth token
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('Setting Authorization header:', config.headers.Authorization);
+    } else {
+      console.warn('No token found in localStorage');
     }
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor for error handling
+// Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('Response error:', error.response || error);
+    console.error('Response error:', error.response);
 
-    // Handle authentication errors
-    if (error.response?.status === 401) {
-      // Only redirect to login if not already on login page
-      if (!window.location.pathname.includes('/login')) {
+    if (error.response) {
+      const { status, data } = error.response;
+
+      // Handle 401 Unauthorized
+      if (status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';
-        toast.error('Session expired. Please login again.');
-      } else {
-        toast.error(error.response?.data?.error || 'Invalid credentials');
+        toast.error('Your session has expired. Please log in again.');
+        return Promise.reject(error);
       }
-    }
-    // Handle not found errors
-    else if (error.response?.status === 404) {
-      toast.error('Resource not found');
-    }
-    // Handle server errors
-    else if (error.response?.status >= 500) {
-      toast.error('Server error. Please try again later.');
-    }
-    // Handle validation errors
-    else if (error.response?.data?.error) {
-      toast.error(error.response.data.error);
-    }
-    // Handle timeout errors
-    else if (error.code === 'ECONNABORTED') {
-      toast.error('Request timed out. Please try again.');
-    }
-    // Handle network errors
-    else if (error.message === 'Network Error') {
+
+      // Handle 403 Forbidden
+      if (status === 403) {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === 'doctor') {
+          window.location.href = '/doctor/patients';
+        } else if (user.role === 'receptionist') {
+          window.location.href = '/receptionist/patients';
+        }
+        toast.error('You do not have permission to access this resource');
+        return Promise.reject(error);
+      }
+
+      // Handle other errors
+      const errorMessage = data?.message || data?.error || 'An error occurred';
+      toast.error(errorMessage);
+    } else {
       toast.error('Network error. Please check your connection.');
     }
-    // Handle other errors
-    else {
-      toast.error('An unexpected error occurred. Please try again.');
-    }
+
     return Promise.reject(error);
   }
 );
