@@ -8,9 +8,6 @@ import {
   Trash2,
   Eye,
   Users,
-  Calendar,
-  Phone,
-  Mail
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { patientService } from '../../services/patientService';
@@ -19,20 +16,32 @@ import PatientForm from '../../components/forms/PatientForm';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ConfirmModal from '../../components/common/ConfirmModal';
 
+// interface ConfirmModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   onConfirm: () => void;
+//   title: string;
+//   message: string;
+//   confirmText: string;
+//   cancelText: string;
+// }
+
 const PatientManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-  const [deletingPatient, setDeletingPatient] = useState<Patient | null>(null);
+  // const [deletingPatient, setDeletingPatient] = useState<Patient | null>(null);
   const [viewingPatient, setViewingPatient] = useState<Patient | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
   const limit = 10;
 
   const { data: patientsData, isLoading } = useQuery({
     queryKey: ['patients', page, search],
-    queryFn: () => patientService.getPatients({ page, limit, search }),
+    queryFn: () => patientService.getPatients({ page, limit, search }, 'receptionist'),
   });
 
   const createMutation = useMutation({
@@ -48,7 +57,7 @@ const PatientManagement: React.FC = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Patient> }) =>
+    mutationFn: ({ id, data }: { id: number; data: Partial<Patient> }) =>
       patientService.updatePatient(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
@@ -60,16 +69,18 @@ const PatientManagement: React.FC = () => {
     }
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: patientService.deletePatient,
+  const deletePatientMutation = useMutation({
+    mutationFn: (id: number) => patientService.deletePatient(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
-      setDeletingPatient(null);
-      toast.success('Patient deleted successfully!');
+      toast.success('Patient deleted successfully');
+      setIsDeleteModalOpen(false);
+      setPatientToDelete(null);
     },
-    onError: () => {
+    onError: (error) => {
       toast.error('Failed to delete patient');
-    }
+      console.error('Error deleting patient:', error);
+    },
   });
 
   const handleCreatePatient = (data: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -82,8 +93,15 @@ const PatientManagement: React.FC = () => {
     }
   };
 
-  const handleDeletePatient = (patient: Patient) => {
-    deleteMutation.mutate(patient.id);
+  const handleDeleteClick = (id: number) => {
+    setPatientToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (patientToDelete) {
+      deletePatientMutation.mutate(patientToDelete);
+    }
   };
 
   const calculateAge = (dateOfBirth: string) => {
@@ -95,6 +113,14 @@ const PatientManagement: React.FC = () => {
       age--;
     }
     return age;
+  };
+
+  const handleViewPatient = (id: number) => {
+    setViewingPatient(patientsData?.data.find(p => p.id === id) || null);
+  };
+
+  const handleEditPatient = (id: number) => {
+    setEditingPatient(patientsData?.data.find(p => p.id === id) || null);
   };
 
   if (showForm || editingPatient) {
@@ -236,22 +262,22 @@ const PatientManagement: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center space-x-3">
                           <button
-                            onClick={() => setViewingPatient(patient)}
-                            className="text-blue-600 hover:text-blue-900"
+                            onClick={() => handleViewPatient(patient.id)}
+                            className="text-primary-600 hover:text-primary-900 mr-4"
                           >
-                            <Eye className="w-5 h-5" />
+                            <Eye className="h-5 w-5" />
                           </button>
                           <button
-                            onClick={() => setEditingPatient(patient)}
-                            className="text-yellow-600 hover:text-yellow-900"
+                            onClick={() => handleEditPatient(patient.id)}
+                            className="text-primary-600 hover:text-primary-900 mr-4"
                           >
-                            <Edit className="w-5 h-5" />
+                            <Edit className="h-5 w-5" />
                           </button>
                           <button
-                            onClick={() => setDeletingPatient(patient)}
+                            onClick={() => handleDeleteClick(patient.id)}
                             className="text-red-600 hover:text-red-900"
                           >
-                            <Trash2 className="w-5 h-5" />
+                            <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
                       </td>
@@ -360,16 +386,18 @@ const PatientManagement: React.FC = () => {
       )}
 
       {/* Delete Confirmation Modal */}
-      {deletingPatient && (
+      {isDeleteModalOpen && (
         <ConfirmModal
-          isOpen={!!deletingPatient}
-          onClose={() => setDeletingPatient(null)}
-          onConfirm={() => handleDeletePatient(deletingPatient)}
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setPatientToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
           title="Delete Patient"
-          message={`Are you sure you want to delete ${deletingPatient.firstName} ${deletingPatient.lastName}? This action cannot be undone.`}
+          message="Are you sure you want to delete this patient? This action cannot be undone."
           confirmText="Delete"
           cancelText="Cancel"
-          isLoading={deleteMutation.isPending}
         />
       )}
     </div>

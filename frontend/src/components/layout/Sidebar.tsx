@@ -1,106 +1,88 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Users, 
-  UserCheck, 
-  FileText, 
-  Calendar, 
-  Settings, 
-  LogOut,
+import { useNavigate } from 'react-router-dom';
+import {
+  Users,
   Stethoscope,
-  Heart
+  LogOut,
+  Menu,
+  X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const Sidebar: React.FC = () => {
-  const { user, logout } = useAuth();
-  const location = useLocation();
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const receptionistMenuItems = [
-    { icon: Users, label: 'Patients', path: '/receptionist/patients' },
-    { icon: Calendar, label: 'Appointments', path: '/receptionist/appointments' },
-    { icon: FileText, label: 'Reports', path: '/receptionist/reports' },
-    { icon: Settings, label: 'Settings', path: '/receptionist/settings' },
-  ];
-
-  const doctorMenuItems = [
-    { icon: UserCheck, label: 'My Patients', path: '/doctor/patients' },
-    { icon: FileText, label: 'Medical Records', path: '/doctor/records' },
-    { icon: Calendar, label: 'Schedule', path: '/doctor/schedule' },
-    { icon: Settings, label: 'Settings', path: '/doctor/settings' },
-  ];
-
-  const menuItems = user?.role === 'receptionist' ? receptionistMenuItems : doctorMenuItems;
-
   return (
-    <div className="bg-white h-full w-64 shadow-lg border-r border-gray-200 flex flex-col">
-      {/* Logo and Brand */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="bg-primary-500 p-2 rounded-lg">
-            <Heart className="w-6 h-6 text-white" />
+    <>
+      {/* Mobile menu button */}
+      <button
+        onClick={onClose}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+      >
+        <span className="sr-only">Open sidebar</span>
+        {isOpen ? (
+          <X className="h-6 w-6" aria-hidden="true" />
+        ) : (
+          <Menu className="h-6 w-6" aria-hidden="true" />
+        )}
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+      >
+        <div className="h-full flex flex-col">
+          {/* Logo */}
+          <div className="flex items-center justify-center h-16 px-4 border-b border-gray-200">
+            <h1 className="text-xl font-bold text-primary-600">MediBridge</h1>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">MediBridge</h1>
-            <p className="text-sm text-gray-500">Healthcare Management</p>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-4 py-4 space-y-1">
+            {user?.role === 'doctor' ? (
+              <button
+                onClick={() => navigate('/doctor/patients')}
+                className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md w-full"
+              >
+                <Stethoscope className="h-5 w-5 mr-3" />
+                My Patients
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/receptionist/patients')}
+                className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md w-full"
+              >
+                <Users className="h-5 w-5 mr-3" />
+                Patient Management
+              </button>
+            )}
+          </nav>
+
+          {/* Logout button */}
+          <div className="p-4 border-t border-gray-200">
+            <button
+              onClick={handleLogout}
+              className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md w-full"
+            >
+              <LogOut className="h-5 w-5 mr-3" />
+              Logout
+            </button>
           </div>
         </div>
       </div>
-
-      {/* User Info */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="bg-primary-100 p-2 rounded-full">
-            <Stethoscope className="w-5 h-5 text-primary-600" />
-          </div>
-          <div>
-            <p className="font-medium text-gray-900">{user?.name}</p>
-            <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Menu */}
-      {/* <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-primary-600' : 'text-gray-400'}`} />
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav> */}
-
-      {/* Logout Button */}
-      <div className="p-4 border-t border-gray-200">
-        <button
-          onClick={handleLogout}
-          className="flex items-center space-x-3 w-full px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all duration-200"
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium">Logout</span>
-        </button>
-      </div>
-    </div>
+    </>
   );
 };
 

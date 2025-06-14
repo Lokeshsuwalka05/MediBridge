@@ -7,13 +7,11 @@ import {
   Users,
   Stethoscope,
   FileText,
-  Heart,
-  Clock,
   AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { patientService } from '../../services/patientService';
-import type { Patient, MedicalRecord } from '../../types';
+import type { Patient } from '../../types';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const DoctorPatients: React.FC = () => {
