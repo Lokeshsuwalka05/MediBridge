@@ -57,16 +57,53 @@ The server will start on `http://localhost:8080` (or the port specified in your 
 
 ### Authentication
 - `POST /login` - Login and get JWT token
+- `GET /auth/validate` - Validate JWT token and get user details
 
 ### Receptionist Endpoints
-- `POST /patients` - Create new patient
-- `GET /patients` - List all patients
-- `PUT /patients/:id` - Update patient
-- `DELETE /patients/:id` - Delete patient
+- `POST /receptionist/patients` - Create a new patient record. Requires `firstName`, `lastName`, `email`, `phone`, `dateOfBirth` (YYYY-MM-DD), `gender` (male/female/other), `address`, `emergencyContact`, `emergencyPhone`. Optional: `bloodGroup`, `allergies`.
+- `GET /receptionist/patients` - Get paginated list of all patients. Supports `page`, `limit`, and `search` query parameters.
+- `PUT /receptionist/patients/:id` - Update patient information. Allows partial updates for `firstName`, `lastName`, `email`, `phone`, `dateOfBirth`, `gender`, `address`, `emergencyContact`, `emergencyPhone`, `bloodGroup`, `allergies`.
+- `DELETE /receptionist/patients/:id` - Delete a patient record.
 
 ### Doctor Endpoints
-- `GET /patients` - View patient list
-- `PATCH /patients/:id` - Update patient record (diagnosis/notes)
+- `GET /doctor/patients` - View paginated list of all patients. Supports `page`, `limit`, and `search` query parameters.
+- `PATCH /doctor/patients/:id` - Update patient medical record (diagnosis and notes). Only `diagnosis` and `notes` fields can be updated by doctors.
+
+## API Documentation with Postman
+
+This project includes a Postman collection and environment to help you easily test and interact with the API endpoints.
+
+### 1. Import Postman Files
+
+1.  Open Postman (ensure you have it installed).
+2.  Click on the "Import" button in the sidebar (or File > Import).
+3.  Select the following files from your `backend/` directory:
+    *   `MediBridge.postman_collection.json`
+    *   `MediBridge.postman_environment.json`
+
+### 2. Configure Environment
+
+1.  In Postman, select the "Environments" tab in the sidebar.
+2.  Choose "MediBridge Environment" from the dropdown.
+3.  Ensure the `base_url` variable is set correctly. For local development, it should be `http://localhost:8080`.
+    *   The `token` variable will be automatically populated after a successful login.
+
+### 3. Using the Collection
+
+The collection is organized into folders:
+
+*   **Auth**: Contains endpoints for user authentication (Login, Validate Token).
+*   **Receptionist**: Contains endpoints for managing patient records (Create, Get, Update, Delete Patients).
+*   **Doctor**: Contains endpoints for viewing and updating patient medical records (Get, Update Patient Medical Record).
+
+**Workflow Example:**
+
+1.  **Login**: Send a `POST` request to `/login` with doctor or receptionist credentials. The response will include a JWT. Postman's test script (if configured) will automatically store this token in your environment.
+    *   Example Doctor Credentials: `{"email": "doctor@medibridge.com", "password": "doctor@#123"}`
+2.  **Validate Token (Optional but Recommended)**: Use the `GET /auth/validate` endpoint to confirm your token is valid and retrieve your user details.
+3.  **Access Protected Routes**: For subsequent requests to protected endpoints (e.g., `/receptionist/patients`, `/doctor/patients`), ensure the `Authorization` header is set to `Bearer {{token}}`. Postman should automatically handle this if the token was saved to the environment.
+
+Each request in the collection includes descriptions, example request bodies, and details on query parameters or path variables where applicable.
 
 ## Default Users
 
