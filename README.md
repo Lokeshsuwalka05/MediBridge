@@ -73,6 +73,12 @@ The server will start on `http://localhost:8080` (or the port specified in your 
 
 This project includes a Postman collection and environment to help you easily test and interact with the API endpoints.
 
+### Online API Documentation
+
+You can also view and interact with the MediBridge API documentation online via Postman:
+
+[https://documenter.getpostman.com/view/45825870/2sB2x6nsrU](https://documenter.getpostman.com/view/45825870/2sB2x6nsrU)
+
 ### 1. Import Postman Files
 
 1.  Open Postman (ensure you have it installed).
