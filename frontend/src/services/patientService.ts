@@ -46,6 +46,13 @@ export const patientService = {
   },
 
   deletePatient: async (id: number): Promise<void> => {
-    await api.delete(`/receptionist/patients/${id}`);
+    try {
+      await api.delete(`/receptionist/patients/${id}`);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        throw new Error('Patient not found');
+      }
+      throw error;
+    }
   },
 };

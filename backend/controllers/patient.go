@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/medibridge/config"
 	"github.com/medibridge/models"
+	"gorm.io/gorm"
 )
 
 type PatientRequest struct {
@@ -241,7 +242,19 @@ func DeletePatient(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.Delete(&models.Patient{}, patientID).Error; err != nil {
+	// First check if patient exists
+	var patient models.Patient
+	if err := config.DB.First(&patient, patientID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Patient not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check patient existence"})
+		return
+	}
+
+	// Perform the deletion
+	if err := config.DB.Delete(&patient).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete patient"})
 		return
 	}

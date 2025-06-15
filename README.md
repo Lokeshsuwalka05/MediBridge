@@ -138,26 +138,40 @@ Backend:https://medibridge-backend-znn8.onrender.com/
 
 ```
 .
-├── cmd/
-│   └── main.go           # Application entry point
-├── config/
-│   └── database.go       # Database configuration
-├── controllers/
-│   ├── auth.go          # Authentication controller
-│   ├── auth_test.go     # Auth tests
-│   └── patient.go       # Patient management controller
-├── middleware/
-│   └── auth.go          # JWT and role middleware
-├── models/
-│   ├── user.go          # User model
-│   └── patient.go       # Patient model
-├── routes/
-│   └── routes.go        # Route definitions
-├── utils/
-│   └── jwt.go           # JWT utilities
-├── .env.example         # Example environment variables
-├── go.mod              # Go module file
-└── README.md           # This file
+├── frontend/           # React frontend application
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/        # Page components
+│   │   ├── services/     # API service calls
+│   │   ├── utils/        # Utility functions
+│   │   └── App.jsx       # Main application component
+│   ├── public/           # Static assets
+│   └── package.json      # Frontend dependencies
+│
+├── backend/            # Go backend application
+│   ├── cmd/
+│   │   └── main.go      # Application entry point
+│   ├── config/
+│   │   └── database.go  # Database configuration
+│   ├── controllers/
+│   │   ├── auth.go      # Authentication controller
+│   │   ├── auth_test.go # Auth tests
+│   │   └── patient.go   # Patient management controller
+│   ├── middleware/
+│   │   └── auth.go      # JWT and role middleware
+│   ├── models/
+│   │   ├── user.go      # User model
+│   │   └── patient.go   # Patient model
+│   ├── routes/
+│   │   └── routes.go    # Route definitions
+│   ├── utils/
+│   │   └── jwt.go       # JWT utilities
+│   ├── .env.example     # Example environment variables
+│   └── go.mod           # Go module file
+│
+├── .gitignore          # Git ignore file
+├── render.yaml         # Render deployment configuration
+└── README.md           # Project documentation
 ```
 
 ## Security Considerations

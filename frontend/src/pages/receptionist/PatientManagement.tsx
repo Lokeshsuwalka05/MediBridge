@@ -77,9 +77,16 @@ const PatientManagement: React.FC = () => {
       setIsDeleteModalOpen(false);
       setPatientToDelete(null);
     },
-    onError: (error) => {
-      toast.error('Failed to delete patient');
-      console.error('Error deleting patient:', error);
+    onError: (error: Error) => {
+      if (error.message === 'Patient not found') {
+        toast.error('Patient not found. The record may have been already deleted.');
+        queryClient.invalidateQueries({ queryKey: ['patients'] });
+      } else {
+        toast.error('Failed to delete patient');
+        console.error('Error deleting patient:', error);
+      }
+      setIsDeleteModalOpen(false);
+      setPatientToDelete(null);
     },
   });
 
