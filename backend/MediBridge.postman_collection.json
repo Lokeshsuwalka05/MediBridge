@@ -34,6 +34,29 @@
             },
             "description": "Login to get JWT token"
           }
+        },
+        {
+          "name": "Validate Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/validate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "validate"
+              ]
+            },
+            "description": "Validate JWT token and get user data"
+          }
         }
       ]
     },
@@ -56,7 +79,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Ravi Sharma\",\n    \"age\": 30,\n    \"gender\": \"Male\",\n    \"symptoms\": \"Fever, cough\"\n}"
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+1234567890\",\n    \"dateOfBirth\": \"1990-01-01\",\n    \"gender\": \"male\",\n    \"address\": \"123 Main St\",\n    \"emergencyContact\": \"Jane Doe\",\n    \"emergencyPhone\": \"+1987654321\",\n    \"bloodGroup\": \"O+\",\n    \"allergies\": \"None\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/receptionist/patients",
@@ -82,16 +105,30 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/receptionist/patients",
+              "raw": "{{base_url}}/receptionist/patients?page=1&limit=10&search=",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "receptionist",
                 "patients"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
               ]
             },
-            "description": "Get list of all patients"
+            "description": "Get paginated list of all patients with search functionality"
           }
         },
         {
@@ -110,7 +147,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Ravi Sharma\",\n    \"age\": 31,\n    \"symptoms\": \"Recovered\"\n}"
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+1234567890\",\n    \"dateOfBirth\": \"1990-01-01\",\n    \"gender\": \"male\",\n    \"address\": \"123 Main St\",\n    \"emergencyContact\": \"Jane Doe\",\n    \"emergencyPhone\": \"+1987654321\",\n    \"bloodGroup\": \"O+\",\n    \"allergies\": \"None\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/receptionist/patients/:id",
@@ -180,20 +217,34 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/doctor/patients",
+              "raw": "{{base_url}}/doctor/patients?page=1&limit=10&search=",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "doctor",
                 "patients"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
               ]
             },
-            "description": "View list of all patients"
+            "description": "View list of all patients with pagination and search"
           }
         },
         {
-          "name": "Update Patient Diagnosis",
+          "name": "Update Patient Medical Record",
           "request": {
             "method": "PATCH",
             "header": [
@@ -208,7 +259,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"diagnosis\": \"Viral Infection\",\n    \"prescription\": \"Paracetamol\"\n}"
+              "raw": "{\n    \"diagnosis\": \"Viral Infection\",\n    \"notes\": \"Patient showing symptoms of viral infection. Prescribed rest and medication.\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/doctor/patients/:id",
@@ -228,7 +279,7 @@
                 }
               ]
             },
-            "description": "Update patient diagnosis and prescription"
+            "description": "Update patient diagnosis and medical notes (Doctor only)"
           }
         }
       ]

@@ -85,13 +85,21 @@ func Login(c *gin.Context) {
 
 // ValidateToken validates the JWT token and returns the user data
 func ValidateToken(c *gin.Context) {
-	// The AuthMiddleware has already validated the token
-	// We just need to return the user data from the context
-	user, exists := c.Get("user")
+	// The AuthMiddleware has already validated the token and set user ID and role
+	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
 		return
 	}
+
+	var user models.User
+	if err := config.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Ensure sensitive data like password hash is not returned
+	user.PasswordHash = ""
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": user,
