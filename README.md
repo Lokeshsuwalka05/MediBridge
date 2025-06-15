@@ -11,6 +11,10 @@ A Golang-based hospital management system with role-based access control for doc
 - PostgreSQL database with GORM ORM
 - Unit tests
 
+## Demo Video
+
+[https://youtu.be/HQbwtpkpRr8?si=jlu6N4474nkxZVS3](https://youtu.be/HQbwtpkpRr8?si=jlu6N4474nkxZVS3)
+
 ## Prerequisites
 
 - Go 1.21 or higher
